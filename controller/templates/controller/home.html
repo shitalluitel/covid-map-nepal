@@ -1,0 +1,271 @@
+<!doctype html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Maps SVG 02</title>
+    <link href="https://playground.anychart.com/docs/samples/Maps_SVG_02/iframe" rel="canonical">
+    <meta content="Choropleth Map,Geo Chart,Geo Visualization" name="keywords">
+    <meta content="AnyChart - JavaScript Charts designed to be embedded and integrated" name="description">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link href="https://cdn.anychart.com/releases/8.7.1/css/anychart-ui.min.css?hcode=a0c21fc77e1449cc86299c5faa067dc4"
+          rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        html, body, #district-map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .small-box {
+            border-radius: .25rem;
+            box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+            display: block;
+            margin-bottom: 20px;
+            position: relative;
+            color: white;
+        }
+
+        .small-box > .inner {
+            padding: 10px;
+        }
+
+        .small-box h3, .small-box p {
+            z-index: 5;
+        }
+
+        .small-box p {
+            font-size: 1rem;
+        }
+
+        .small-box > .small-box-footer {
+            background: rgba(0, 0, 0, .1);
+            color: rgba(255, 255, 255, .8);
+            display: block;
+            padding: 3px 0;
+            position: relative;
+            text-align: center;
+            text-decoration: none;
+            z-index: 10;
+        }
+
+        .small-box h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            padding: 0;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3><span id="total-cases"></span></h3>
+                    <p>Total Cases</p>
+                </div>
+                <div class="small-box-footer"></div>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3><span id="recovered-cases"></span></h3>
+
+                    <p>Recovered Cases</p>
+                </div>
+                <div class="small-box-footer"></div>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3><span id="active-cases"></span></h3>
+                    <p>Active Cases</p>
+                </div>
+                <div class="small-box-footer"></div>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3><span id="death-cases"></span></h3>
+
+                    <p>Death Cases</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-pie-graph"></i>
+                </div>
+                <div class="small-box-footer"></div>
+            </div>
+        </div>
+        <!-- ./col -->
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="offset-md-4">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="cases" title="Covid 19 data map. (Total Cases)" class="btn btn-info change-map">Total
+                    Cases
+                </button>
+                <button id="active" title="Covid 19 data map. (Active Cases)" class="btn btn-info change-map">Active
+                    Cases
+                </button>
+                <button id="recovered" title="Covid 19 data map. (Recovered Cases)" class="btn btn-info change-map">
+                    Recovered Cases
+                </button>
+                <button id="deaths" title="Covid 19 data map. (Deaths Cases)" class="btn btn-info change-map">Death
+                    Cases
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="district-map"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="gender" data-toggle="tab" href="#home" role="tab"
+                       aria-controls="home"
+                       aria-selected="true">Gender</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="type" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+                       aria-selected="false">Type of Transmission</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="age-group" data-toggle="tab" href="#contact" role="tab"
+                       aria-controls="contact"
+                       aria-selected="false">Age Group</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="gender">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="gender-container-cases">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="gender-container-active">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="gender-container-recovered">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="gender-container-deaths">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="type">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="type-container-cases">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="type-container-active">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="type-container-recovered">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="type-container-deaths">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="age-group">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="age-container-cases">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="age-container-active">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="age-container-recovered">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="age-container-deaths">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-base.min.js?hcode=a0c21fc77e1449cc86299c5faa067dc4"></script>
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-map.min.js?hcode=a0c21fc77e1449cc86299c5faa067dc4"></script>
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-exports.min.js?hcode=a0c21fc77e1449cc86299c5faa067dc4"></script>
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-ui.min.js?hcode=a0c21fc77e1449cc86299c5faa067dc4"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script type="text/javascript">
+    let ctx = {{ ctx }};
+    let total = ctx.total;
+    let current_status = ctx.current_state
+    let province = ctx.province;
+    let district = ctx.district;
+    let gender = ctx.gender;
+    let type = ctx.type;
+    let age = ctx.age_group;
+    let province_map = null;
+    let district_map = null;
+</script>
+<script src="{% static 'js/map_function.min.js' %}"></script>
+</body>
+</html>
